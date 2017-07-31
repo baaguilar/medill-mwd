@@ -90,7 +90,7 @@
                             </ul>
                       </li>
                     </ul>
-                    <p class="navbar-text">Some text </p>
+                    <p class="navbar-text">Some text</p>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
                         <li class=""><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
@@ -121,32 +121,34 @@
                 
                 var inc = 5;
                 
-                $("#load").attr("start",0).attr("end",inc-1); //show first items
+                $("#load").attr("start",0).attr("end",inc-1); //set start/end items for Load More button
                 
-                var url = 'data/news.xml';
-                var title = '';
+                // xml file
+                var url = 'data/CURL-MW.php';
                 
+                // load initial news items via ajax();
                 $.ajax({
                     url: url,
                     dataType: "xml",
                     success: function(data) { 
-                        var start = $("#load").attr("start"); // initially set to 0
-                        var end = $("#load").attr("end"); // initially set to 8
-                        cardLoad(data,start,end); // add Cards from 1-10   
+                        var start = $("#load").attr("start"); // find starting index value
+                        var end = $("#load").attr("end"); // find ending index value
+                        storyData(data,start,end); // cardLoad function with start/end values passed 
                    },
                     error: function(){ // spit out error if unable to access feed
                         $("#container").text("Error. Trouble accessing feed.")
                     }
                 });
                 
-                // create
-                function cardLoad(data,start,end){
+                // start collecting story assets to build out each tile 
+                function storyData(data,start,end){
                     
-                    var l = $(data).find('channel item').length;
+                    // total number of stories
+                    var story_count = $(data).find('channel item').length;
                     
-                    $(data).find('channel item').each(function(items,value){
+                    $(data).find('channel item').each(function(index,value){
                         
-                        if(items >= start && items <= end){
+                        if(index >= start && index <= end){
                             
                             var title = $(this).find('title').text();
                             var desc = $(this).find('description').text();
@@ -157,43 +159,23 @@
 
                             var img = $(this).find('media\\:content, content').attr('url').replace('_MC_', '_MG_');
 
-                            var num = items+1;
+                            var num = index+1; // Move the count away from zero-based index
                             
 
-                            createCard(num,title,link,desc,date,img,l); // pass data to function createCard
+                            createCard(num,title,link,desc,date,img,story_count); // pass data to function createCard
                         } 
                     });
                 }
                 
-                
-                
-                $("#load").click(function(){
-                    var start = Number($("#load").attr("start"))+inc;
-                    var end = Number($("#load").attr("end"))+inc;
-                    $("#load").attr("start",start).attr("end",end);
-
-                    $.ajax({
-                        url: url,
-                        dataType: "xml",
-                        success: function(data) {
-                            var l = $(data).find('channel item');
-                            if( l.length <= (end+1)){
-                                $("#load").hide();
-                                $("#end").show();
-                        }   
-                            
-                            cardLoad(data,start,end); 
-                        },
-                        error: function(){ // spit out error if unable to access feed
-                            $("#container").text("Error. Trouble accessing feed.")
-                        }
-                    });
-                    
-                })
-                
-                // format the date 
+                /* 
+                Format the date to this format.
+                Currently set to this format: 
+                "Thu Jul 27 2017 18:04:08 GMT-0400 (EDT)" 
+                */ 
                 function formatDate(date) { 
                   
+                    
+                    // array with each month listed. Used to pull back correct month
                     var monthNames = [ 
                             "January", "February", "March",
                             "April", "May", "June", "July",
@@ -201,26 +183,60 @@
                             "November", "December"
                     ];
 
-                    var day = date.getDate(); // Day as 1-31
-                    var monthIndex = date.getMonth(); // Month as 0-11
-                    var year = date.getFullYear(); // Year as YYYY
-
-                    return monthNames[monthIndex] + ' '+ day + ', ' + year;
+                    var day = date.getDate(); // Day set as 1-31
+                    var monthIndex = date.getMonth(); // Month set as 0-11
+                    var year = date.getFullYear(); // Year set as YYYY
+                    
+                    return monthNames[monthIndex] + ' '+ day + ', ' + year; // return the correctly formatted date
                     
                 }
 
                 // Build out each news card to send back to the page
-                function createCard(num,title,link,desc,date,img,count){
+                function createCard(num,title,link,desc,date,img,story_count){
                     $("<div>",{id:"story"+num,number:num,class:"col-sm-6 col-md-4"}).appendTo(".tiles");
                     $("<div>",{class:"thumbnail"}).appendTo("#story"+num);
                     $("<img>",{src:img,alt:title}).appendTo("#story"+num+" .thumbnail");
                     $("<div>",{class:"caption"}).appendTo("#story"+num+" .thumbnail");
                     $("<h3>").text(title).appendTo("#story"+num+" .caption");
-                    $("<p>",{text:num+" of "+count+" "+date,class:"byline"}).appendTo("#story"+num+" .caption");
+                    $("<p>",{text:num+" of "+story_count+" "+date,class:"byline"}).appendTo("#story"+num+" .caption");
                     $("<p>",{text:desc}).appendTo("#story"+num+" .caption");
                     $("<p>").appendTo("#story"+num+" .caption");
                     $("<a>",{href:link,class:"btn btn-primary",role:"button"}).text('Read More').appendTo("#story"+num+" .caption");  
                 }
+                
+                /* 
+                LOAD BUTTON
+                Determine how many tiles have already been loaded and how many more to display
+                */
+                $("#load").click(function(){
+                    
+                    // tile range
+                    var start = Number($("#load").attr("start"))+inc; // get start number using var "inc"
+                    var end = Number($("#load").attr("end"))+inc; // get end number using var "inc"
+                    
+                    // update Load button with new start/end
+                    $("#load").attr("start",start).attr("end",end);
+                    
+                    // load initial news items via ajax();
+                    $.ajax({
+                        url: url,
+                        dataType: "xml",
+                        success: function(data) {
+                            
+                            // Determine if we should continue to show Load button or not
+                            var story_count = $(data).find('channel item'); // get total number of stories
+                            if( story_count.length <= (end+1)){ // compare story_count to number of tiles showing
+                                $("#load").hide(); // hide Load button
+                                $("#end").show(); // show ending message
+                        }   
+                            storyData(data,start,end); // Pass story data
+                        },
+                        error: function(){ // spit out error if unable to access feed
+                            $("#container").text("Error. Trouble accessing feed.")
+                        }
+                    });
+                    
+                })
                 
             });
                 
