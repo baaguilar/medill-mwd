@@ -27,12 +27,12 @@
             }
             
             #container {
-                margin-bottom:2.5%;
+                margin-bottom:10px;
             }
             
-            .thumbnail {
-                height:600px;
-                overflow-y:scroll;
+            .row {
+                padding-left:10px;
+                padding-right:10px;
             }
             
             .navbar-text { 
@@ -41,6 +41,15 @@
             
             .byline {
                 color:#ccc;
+            }
+            
+            #footer {
+                padding-top:20px; 
+                border-top:1px solid #ccc;
+                text-align:center;
+                margin-right:auto;
+                margin-left:auto;
+                width:70%;
             }
             
             #end {
@@ -55,8 +64,7 @@
             
             @media (max-width: 768px) {
                 .thumbnail {
-                    height:auto;
-                    border:1px solid #cc0000;
+                    height:auto; /* no need to force height on phone */
                 }
             }
             
@@ -103,13 +111,18 @@
         <div id="container" class=".container-fluid">
             
             <!-- ADDING ROWS AND COLUMNS. Setting up our template. -->
-            <div class="tiles">
-                
-
+            <div class="row">
+                <div class="tiles">
+                </div>
             </div>
-            
-            <button class="btn btn-default" id="load" start end>Load More</button>
-            <div id="end">No more stories. Thanks for reading.</div>
+
+            <div class="row" id="footer">
+                <div>
+                    <p></p>
+                    <button class="btn btn btn-success" id="load" start end>Load More</button>
+                    <div id="end">No more stories. Thanks for reading.</div> 
+                </div>
+            </div>
         </div>
         
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -119,12 +132,12 @@
         <script>
             $(document).ready(function() {
                 
-                var inc = 5;
+                var inc = 4; // number of stories to show. Not zero-based.
                 
                 $("#load").attr("start",0).attr("end",inc-1); //set start/end items for Load More button
                 
                 // xml file
-                var url = 'https://ancient-shore-39193.herokuapp.com/data/curl-mw.php';
+                var url = 'data/curl-mw.php';
                 
                 // load initial news items via ajax();
                 $.ajax({
@@ -150,6 +163,14 @@
                         
                         if(index >= start && index <= end){
                             
+                            if(index % 4 == 0 ){
+                                $("<div>",{class:"row"}).appendTo(".tiles");
+                            }
+                            
+                            if(index % 2 == 0 ){
+                                $("<div>",{class:"clearfix visible-sm visible-md"}).appendTo(".tiles .row:last");
+                            }
+                            
                             var title = $(this).find('title').text();
                             var desc = $(this).find('description').text();
                             var link = $(this).find('link').text();
@@ -160,7 +181,7 @@
                             var img = $(this).find('media\\:content, content').attr('url').replace('_MC_', '_MG_');
 
                             var num = index+1; // Move the count away from zero-based index
-                            
+                            $("#footer").find("p").text(num+" of "+story_count);
 
                             createCard(num,title,link,desc,date,img,story_count); // pass data to function createCard
                         } 
@@ -193,15 +214,17 @@
 
                 // Build out each news card to send back to the page
                 function createCard(num,title,link,desc,date,img,story_count){
-                    $("<div>",{id:"story"+num,number:num,class:"col-sm-6 col-md-4"}).appendTo(".tiles");
+                    
+                    $("<div>",{id:"story"+num,number:num,class:"col-sm-6 col-lg-3"}).appendTo(".tiles .row:last");
                     $("<div>",{class:"thumbnail"}).appendTo("#story"+num);
                     $("<img>",{src:img,alt:title}).appendTo("#story"+num+" .thumbnail");
                     $("<div>",{class:"caption"}).appendTo("#story"+num+" .thumbnail");
                     $("<h3>").text(title).appendTo("#story"+num+" .caption");
-                    $("<p>",{text:num+" of "+story_count+" "+date,class:"byline"}).appendTo("#story"+num+" .caption");
+                    $("<p>",{date,class:"byline"}).appendTo("#story"+num+" .caption");
                     $("<p>",{text:desc}).appendTo("#story"+num+" .caption");
                     $("<p>").appendTo("#story"+num+" .caption");
-                    $("<a>",{href:link,class:"btn btn-primary",role:"button"}).text('Read More').appendTo("#story"+num+" .caption");  
+                    $("<a>",{href:link,class:"btn btn-primary",role:"button"}).text('Read More').appendTo("#story"+num+" .caption"); 
+                    
                 }
                 
                 /* 
