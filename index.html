@@ -53,6 +53,37 @@
                 display:none;
             }
             
+            #loading {
+                position:fixed;
+                top:0;
+                left:0;
+                width:100%;
+                height:100%;
+                z-index:1;
+            }
+            
+            #loading_txt {
+                position:absolute;
+                width:100%;
+                font-size:2em;
+                color:#fff;
+                text-align:center;
+                margin-top:20%;
+                margin-bottom:20%;
+                z-index:100;
+                background-color:#cc0000;
+            }
+            
+            #loading_bg {
+                position:absolute;
+                top:0;
+                left:0;
+                background-color:#000000;
+                opacity:0.75;
+                width:100%;
+                height:100%;
+            }
+            
             @media (max-width: 768px) {
                 .thumbnail {
                     height:auto; /* no need to force height on phone */
@@ -87,6 +118,11 @@
               </div>
         </nav>
         
+        <div id="loading">
+            <div id="loading_txt">Loading ...</div>
+            <div id="loading_bg"></div>
+        </div>
+        
         <div id="container" class=".container-fluid">
             <h1></h1>
             <!-- ADDING ROWS AND COLUMNS. Setting up our template. -->
@@ -109,7 +145,7 @@
         <script>
             $(document).ready(function() {
                 
-                var inc = 4; // number of stories to show. Not zero-based.
+                var inc = 8; // number of stories to show. Not zero-based.
                 
                 $("#load").attr("start",0).attr("end",inc-1); //set start/end items for Load More button
                 
@@ -176,10 +212,14 @@
                                 var img = img.attr('url').replace('_MC_', '_MG_');
                             } else {
                                 var img = 'img/mw_placeholder.png';
-                            }
-                            
+                            } 
                             
                             var num = index+1; // Move the count away from zero-based index
+                        
+                            if(num == story_count){ // check if we no longer need the Load button
+                                $("#load").hide(); // hide Load button
+                                $("#end").show(); // show ending message
+                            }
                             
                             date = formatDate(date);
                             
@@ -188,6 +228,8 @@
                             createCard(num,title,link,desc,date,img,story_count); // pass data to function createCard
                         } 
                     });
+                    
+                    $("#loading").hide();
                 }
                 
                 /* 
@@ -234,6 +276,8 @@
                 */
                 $("#load").click(function(){
                     
+                    $("#loading").show(); // fire the loading overlay ... 
+                    
                     // tile range
                     var start = Number($("#load").attr("start"))+inc; // get start number using var "inc"
                     var end = Number($("#load").attr("end"))+inc; // get end number using var "inc"
@@ -246,13 +290,6 @@
                         url: url,
                         dataType: "xml",
                         success: function(data) {
-                            
-                            // Determine if we should continue to show Load button or not
-                            var story_count = $(data).find('channel item'); // get total number of stories
-                            if( story_count.length <= (end+1)){ // compare story_count to number of tiles showing
-                                $("#load").hide(); // hide Load button
-                                $("#end").show(); // show ending message
-                        }   
                             storyData(data,start,end); // Pass story data
                         },
                         error: function(){ // spit out error if unable to access feed
