@@ -54,29 +54,7 @@
             <div id="loading_bg"></div>
         </div>
         
-        <div id="container" class=".container">
-            <div class="row">
-	<div class="col-xs-6">
-		<div class="thumbnail">
-			<img src="http://mw2.wsj.net/mw5/content/logos/mw_logo_onDark.svg" />
-			<div class="caption">
-				<h3>Title</h3>
-				<p>More text here</p>
-			</div>
-		</div>
-	</div>
-	<div class="col-xs-6">
-		<div class="thumbnail">
-		  <img src="http://mw2.wsj.net/mw5/content/logos/mw_logo_onDark.svg" />
-		  <div class="caption">
-			<h3>Title</h3>
-			<p>More text here</p>
-		  </div>
-		</div>
-  	</div>	
-</div>
-            
-            
+        <div id="container" class=".container">            
             <h1></h1>
             <!-- ADDING ROWS AND COLUMNS. Setting up our template. -->
             <div class="tiles">
@@ -161,7 +139,7 @@
                             var date = new Date($(this).find('pubDate').text());
                             var img = $(this).find('media\\:content, content');
                             if(img.length > 0){
-                                var img = img.attr('url').replace('_MC_', '_MG_');
+                                img = img.attr('url').replace('_MC_', '_MG_');
                             } else {
                                 var img = 'img/mw_placeholder.png';
                             } 
