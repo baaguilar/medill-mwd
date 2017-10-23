@@ -36,9 +36,9 @@
                 </div>
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="index.html">Home</a></li>
                         <li><a href="tech.html">Tech</a></li>
-                        <li><a href="markets.html">Markets</a></li>
+                        <li class="active"><a href="#">Markets</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
@@ -55,28 +55,6 @@
         </div>
         
         <div id="container" class=".container">
-            <div class="row">
-	<div class="col-xs-6">
-		<div class="thumbnail">
-			<img src="http://mw2.wsj.net/mw5/content/logos/mw_logo_onDark.svg" />
-			<div class="caption">
-				<h3>Title</h3>
-				<p>More text here</p>
-			</div>
-		</div>
-	</div>
-	<div class="col-xs-6">
-		<div class="thumbnail">
-		  <img src="http://mw2.wsj.net/mw5/content/logos/mw_logo_onDark.svg" />
-		  <div class="caption">
-			<h3>Title</h3>
-			<p>More text here</p>
-		  </div>
-		</div>
-  	</div>	
-</div>
-            
-            
             <h1></h1>
             <!-- ADDING ROWS AND COLUMNS. Setting up our template. -->
             <div class="tiles">
@@ -102,12 +80,10 @@
                 
                 $("#load").attr("start",0).attr("end",inc-1); //set start/end items for Load More button
                 
-                var top_stories = 'https://www.marketwatch.com/news/rss/latestnews&images=true';
                 var markets = 'https://www.marketwatch.com/news/rss/markets&images=true';
-                var tech = 'https://www.marketwatch.com/news/rss/techfactiva&images=true';
                 
                 // xml file
-                var url = 'data/curl-mw.php?url='+top_stories;
+                var url = 'data/curl-mw.php?url='+markets;
                 
                 // load initial news items via ajax();
                 $.ajax({
